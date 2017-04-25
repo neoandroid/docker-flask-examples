@@ -1,0 +1,27 @@
+version: "3"
+services:
+  web:
+    build: app/.
+    environment:
+      - MYSQL_USER=appUser
+      - MYSQL_PASS=appPassword
+      - MYSQL_DB=dexma
+      - MYSQL_HOST=db
+      - FLASK_APP=app.py
+    ports:
+      - "5000:5000"
+    links:
+      - db
+    depends_on:
+      - db
+    command: ["wait-for-it.sh", "db:3306", "--", "python", "-m", "flask", "run", "--host=0.0.0.0"]
+
+  db:
+    build: mysql/.
+    volumes:
+      - /var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=supersecure
+      - MYSQL_DATABASE=dexma
+      - MYSQL_USER=appUser
+      - MYSQL_PASSWORD=appPassword
